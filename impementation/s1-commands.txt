@@ -1,0 +1,16 @@
+# --- Forwarding table: destination IP -> egress port -----------------
+# Port assignment follows topology.py link-creation order:
+#   h1 -> port 1, h2 -> port 2, h3 -> port 3, h4 -> port 4, h5 (collector) -> port 5
+table_add MyIngress.forwarding set_egress_port 10.0.0.1 => 1
+table_add MyIngress.forwarding set_egress_port 10.0.0.2 => 2
+table_add MyIngress.forwarding set_egress_port 10.0.0.3 => 3
+table_add MyIngress.forwarding set_egress_port 10.0.0.4 => 4
+table_add MyIngress.forwarding set_egress_port 10.0.0.5 => 5
+
+# --- Mirroring session used by clone3() for straggler telemetry -------
+# Session 1 clones matching packets out of port 5 (h5, the collector).
+mirroring_add 1 5
+
+# --- Operator-defined skew threshold theta, in microseconds -----------
+# 300000 us = 300 ms. Tune this based on expected network RTT / jitter.
+register_write MyIngress.regThreshold 0 300000
